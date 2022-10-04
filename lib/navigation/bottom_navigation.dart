@@ -24,7 +24,6 @@ class BottomNavigation extends StatelessWidget {
         TabItem.values[index],
       ),
       currentIndex: currentTab.index,
-      // selectedItemColor: currentTab.path,
     );
   }
 }

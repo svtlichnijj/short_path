@@ -17,27 +17,9 @@ class Task {
   });
 
   factory Task.fromJson(Map<String, dynamic> json) {
-    // print('json');
-    // print(json);
-    // print("json.runtimeType");
-    // print(json.runtimeType);
-    // print('field');
-    // print(json['field']);
-    // print("json['field'].runtimeType");
-    // print(json['field'].runtimeType);
-    // print(json['field'] as Map<String, dynamic>);
     return Task(
       id: json['id'],
-      // field: Field.fromJson(
-      //   // { for (var r in json['field']) 'rowsColumns' : { for (var c in r) 'c': c} }
-      //   { for (var e in json['field']) 'rowsColumns' : {'0': e} }
-      //   // Map.fromIterable(json['field'], key: (e) => 'rowsColumns', value: (e) => {0: e},)
-      // ),
       field: Field.fromJson({'rowsColumns': {Field.jsonFieldName: json['field']}}),
-      // field: Field.fromJson(json['field'] as Map<String, dynamic>),
-      // field: Field.fromJson(json),
-      // field: Field.fromJson(json),
-      // field: Field.fromJson({'rowsColumns': {'field': json['field']}}),
       start: PointDto.fromJson(json['start']),
       end: PointDto.fromJson(json['end']),
     );

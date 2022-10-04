@@ -21,46 +21,30 @@ class TextContainer extends StatelessWidget {
         ));
   }
 
-  static getTextErrorList(var textError) {
+  static getTextError(context, String textError) {
+    return Padding(
+        padding: const EdgeInsets.fromLTRB(10, 16, 10, 10),
+        child: Text(
+          textError.toString(),
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Theme.of(context).errorColor,
+            fontSize: 18.0,
+          ),
+        )
+    );
+  }
+
+  static getTextErrorList(context, textError) {
     return <Widget>[
-      const Center(
+      Center(
         child: Icon(
           Icons.error_outline,
-          color: Colors.red,
+          color: Theme.of(context).errorColor,
           size: 60,
         ),
       ),
-      Padding(
-          padding: const EdgeInsets.only(top: 16),
-          child: Text(textError.toString(), style: TextStyle(background: Paint()..color = Colors.red))
-      )
+      getTextError(context, textError.toString())
     ];
-  }
-}
-
-class TextErrorContainer extends StatelessWidget {
-  final String textError;
-  const TextErrorContainer({Key? key, required this.textError}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          const Center(
-            child: Icon(
-              Icons.error_outline,
-              color: Colors.red,
-              size: 60,
-            ),
-          ),
-          Padding(
-              padding: const EdgeInsets.only(top: 16),
-              child: Text(textError, style: TextStyle(background: Paint()..color = Colors.red))
-          )
-        ],
-      ),
-    );
   }
 }

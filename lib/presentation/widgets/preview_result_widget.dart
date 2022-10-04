@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:short_path/data/local/local_storage.dart';
 import 'package:short_path/domain/dto/point_dto.dart';
+import 'package:short_path/domain/enums/point_color.dart';
 import 'package:short_path/domain/models/field_path.dart';
+import 'package:short_path/presentation/widgets/text_container.dart';
 
 class PreviewResultWidget extends StatefulWidget {
   final String taskId;
@@ -13,8 +15,6 @@ class PreviewResultWidget extends StatefulWidget {
 }
 
 class _PreviewResultWidgetState extends State<PreviewResultWidget> {
-  // final ProcessFindPath processFindPath = ProcessFindPath();
-  // final Future<List<TableRow>> _previewResultTable = _constructPreviewResultTable();
 
   @override
   Widget build(BuildContext context) {
@@ -28,30 +28,26 @@ class _PreviewResultWidgetState extends State<PreviewResultWidget> {
               color: Colors.red,
               width: 3.0,
             ),
-            // defaultVerticalAlignment: TableCellVerticalAlignment.middle,
           );
         } else {
           return Center(
-            child: Text('Can\'t found preview result by task id: "${widget.taskId}"'),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                TextContainer.getTextError(context, 'Can\'t found preview result by task id: "${widget.taskId}"')
+              ],
+            ),
           );
         }
       },
     );
   }
 
-  // void _constructPreviewResultTable() async {
   Future<List<TableRow>> _constructPreviewResultTable() async {
     List<TableRow> fieldRows = [];
-    // print('widget.taskId');
-    // print(widget.taskId);
     FieldPath? path = await LocalStorage.getPath(widget.taskId);
-    // Path path = processFindPath.pathsPoints(widget.taskId);
 
-    // print('path');
-    // print(path);
     if (path == null) {
-      // _previewResultTable = fieldRows;
-      // return;
       return fieldRows;
     }
 
@@ -67,7 +63,7 @@ class _PreviewResultWidgetState extends State<PreviewResultWidget> {
         tableCells.add(TableCell(
             child: SizedBox.square(
               child: Container(
-                color: path.getBackgroundColor(row[c]),
+                color: PointColor.get(path.getPointColorType(row[c])),
                 child: Center(
                   child: Text(
                     row[c].toPath(),
@@ -82,7 +78,6 @@ class _PreviewResultWidgetState extends State<PreviewResultWidget> {
       fieldRows.add(TableRow(children: tableCells));
     }
 
-    // _previewResultTable = fieldRows;
     return fieldRows;
   }
 }

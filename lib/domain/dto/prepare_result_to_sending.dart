@@ -1,15 +1,9 @@
-import 'package:json_annotation/json_annotation.dart';
-
+import 'package:short_path/data/local/local_storage.dart';
 import 'package:short_path/domain/dto/results_to_sending.dart';
+import 'package:short_path/domain/models/field_path.dart';
 
-part 'prepare_result_to_sending.g.dart';
-
-@JsonSerializable(explicitToJson: true)
 class PrepareResultToSending {
-  @JsonKey(required: true)
   String id;
-
-  @JsonKey(required: true)
   ResultToSending result;
 
   PrepareResultToSending({
@@ -17,14 +11,38 @@ class PrepareResultToSending {
     required this.result,
   });
 
-  factory PrepareResultToSending.fromJson(Map<String, dynamic> json) => _$PrepareResultToSendingFromJson(json);
-  // PrepareResultToSending.fromJson(Map<String, dynamic> json)
-  //     : id = json['id'],
-  //       result = json['result'];
+  factory PrepareResultToSending.fromJson(Map<String, dynamic> json) => PrepareResultToSending(
+    id: json['id'] as String,
+    result: ResultToSending.fromJson(json['result'] as Map<String, dynamic>),
+  );
 
-  Map<String, dynamic> toJson() => _$PrepareResultToSendingToJson(this);
-  // Map<String, dynamic> toJson() => {
-  //       'id': id,
-  //       'result': result.toJson(),
-  //     };
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'result': result.toJson(),
+  };
+
+  static Stream<List<PrepareResultToSending>> listFromLocalPathsPoints() async* {
+    Map<String, FieldPath>? pathsPoints;
+
+    while (pathsPoints == null) {
+      pathsPoints = await LocalStorage.getPaths();
+      await Future<void>.delayed(const Duration(seconds: 2));
+      yield prepareResultsFromPathsPoints({});
+    }
+
+    yield prepareResultsFromPathsPoints(pathsPoints);
+  }
+
+  static List<PrepareResultToSending> prepareResultsFromPathsPoints(Map<String, FieldPath> pathsPoints) {
+    List<PrepareResultToSending> prepareResults = [];
+
+    pathsPoints.forEach((String taskId, FieldPath pathsValid) {
+      prepareResults.add(PrepareResultToSending(
+          id: taskId,
+          result: ResultToSending(pathsValid.steps)
+      ));
+    });
+
+    return prepareResults;
+  }
 }

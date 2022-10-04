@@ -2,7 +2,7 @@ enum TabItem {
   main('main'),
   resultList('result_list');
 
-  final String path;
+  final String name;
 
-  const TabItem(this.path);
+  const TabItem(this.name);
 }

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:json_annotation/json_annotation.dart';
 
 import 'package:short_path/domain/enums/point_color.dart';
@@ -13,7 +11,6 @@ part 'field_path.g.dart';
 @JsonSerializable(explicitToJson: true)
 class FieldPath {
   @JsonKey(required: true)
-  // StepsDto steps = StepsDto(points: []);
   StepsDto steps = StepsDto({});
 
   @JsonKey(required: true)
@@ -24,25 +21,8 @@ class FieldPath {
   factory FieldPath.fromJson(Map<String, dynamic> json) => _$FieldPathFromJson(json);
 
   Map<String, dynamic> toJson() => _$FieldPathToJson(this);
-  // Path.fromJson(Map<String, dynamic> json)
-  //     : steps = json['steps'],
-  //       field = json['field'];
-
-  // static Map toJson(Path path) => {
-  //       'steps': path.steps,
-  //       'field': path.field,
-  //     };
-  // Map toJson() {
-  //   print('Path toJson');
-  //   return {
-  //       // 'steps': steps,
-  //       'field': field,
-  //     };
-  //   }
 
   get points {
-    // print('steps.points');
-    // print(steps.points);
     return steps.points;
   }
 
@@ -51,17 +31,12 @@ class FieldPath {
       PointDto pointToAdd = field.rowsColumns[point.y][point.x];
 
       if (!(isPassingOnly && pointToAdd.state != PointStates.passing)) {
-        // if (steps.points.contains(pointToAdd)) {
-        //   return false;
-        // }
-        // steps.points.add(pointToAdd);
-        // return true;
-        // OR If steps.points is Set
         return steps.points.add(pointToAdd);
       }
 
       return false;
     } catch (e) {
+      // To exclude "RangeError (index): Invalid value: Not in inclusive range..."
       return false;
     }
   }
@@ -70,27 +45,17 @@ class FieldPath {
     return addPoint(PointDto(x: xIn, y: yIn), isPassingOnly: isPassingOnlyIn);
   }
 
-  Color getBackgroundColor(PointDto point) {
+  PointColorTypes getPointColorType(PointDto point) {
     PointColorTypes pointColorType = PointColorTypes.empty;
 
     if (point.state == PointStates.impassable) {
       pointColorType = PointColorTypes.blocked;
     } else {
-      // print('point');
-      // print(point.toJson());
-      // print('steps.points');
-      // print(jsonEncode(steps.points));
-      // print(json.encode(steps.points));
       int stepsPointsIndex = steps.points.toList().indexWhere((element) => element.isEqual(point));
-      // // int stepsPointsIndex = steps.points.toList().indexOf(point);
-      // print('stepsPointsIndex');
-      // print(stepsPointsIndex);
 
       if (stepsPointsIndex != -1) {
         pointColorType = PointColorTypes.shortestPath;
         int stepsPointsLastIndex = steps.points.length - 1;
-        // print('stepsPointsLastIndex');
-        // print(stepsPointsLastIndex);
 
         if (stepsPointsIndex == 0) {
           pointColorType = PointColorTypes.starting;
@@ -100,6 +65,6 @@ class FieldPath {
       }
     }
     
-    return PointColor.get(pointColorType);
+    return pointColorType;
   }
 }

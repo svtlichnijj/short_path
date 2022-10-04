@@ -1,6 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'package:short_path/domain/dto/results_to_sending.dart';
+import 'package:short_path/domain/dto/prepare_result_to_sending.dart';
 import 'package:short_path/navigation/tab_item.dart';
 import 'package:short_path/navigation/bottom_navigation.dart';
 import 'package:short_path/presentation/controllers/process_find_path.dart';
@@ -17,33 +18,27 @@ class ProgressWidget extends StatefulWidget {
 }
 
 class _ProgressWidgetState extends State<ProgressWidget> {
-  // late Future<ProcessFindPath> futureTask;
   final ProcessFindPath _controller = ProcessFindPath();
   late Stream<ProcessFindPath> futureTask = _controller.start(widget.processUrl);
-  // final PagesState _pagesState = PagesState();
   bool isActiveButton = true;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   futureTask = _controller.start(widget.processUrl);
-  // }
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<ProcessFindPath>(
       stream: futureTask,
-      // return FutureBuilder<ProcessFindPath>(
-      //   future: futureTask,
       builder: (BuildContext context, AsyncSnapshot<ProcessFindPath> snapshot) {
+        if (kDebugMode) {
+          print('snapshot.connectionState');
+          print(snapshot.connectionState);
+        }
+
         List<Widget> children = <Widget>[
           const CircularProgressIndicator()
         ];
+
         if (snapshot.hasError) {
-          children = TextContainer.getTextErrorList(snapshot.error);
+          children = TextContainer.getTextErrorList(context, snapshot.error.toString());
         } else {
-          print('snapshot.connectionState');
-          print(snapshot.connectionState);
           switch (snapshot.connectionState) {
             case ConnectionState.none:
               children = <Widget>[
@@ -56,88 +51,39 @@ class _ProgressWidgetState extends State<ProgressWidget> {
             case ConnectionState.active:
             case ConnectionState.done:
               if (snapshot.hasData) {
-                // print('--snapshot.data--');
-                // print(snapshot.data);
+                int percentageCalculation = snapshot.data!.percentageCalculation;
+                bool isDone = snapshot.connectionState == ConnectionState.done;
                 children = <Widget>[
-                  // const Text('snapshot.hasData'),
                   TextContainer(
-                      text: 'All calculations has finished, you can send your results to server',
-                      isTransparent: snapshot.connectionState != ConnectionState.done,
+                    text: 'All calculations has finished, you can send your results to server',
+                    isTransparent: !isDone,
                   ),
                   CircularProgressIndicator(
-                    value: (snapshot.data!.percentageCalculation.clamp(0, 100) / 100).toDouble(),
+                    value: isActiveButton ? (percentageCalculation.clamp(0, 100) / 100).toDouble() : null,
                   ),
-                  Text(snapshot.data!.percentageCalculation.toString()),
+                  TextContainer(
+                    text: percentageCalculation.toString(),
+                    isTransparent: !isActiveButton,
+                  ),
                   Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(10.0),
                       child: ElevatedButton(
-                        // child: ValueListenableBuilder<bool>(
-                        //     valueListenable: snapshot.data!.isCalculationFinished,
-                        //     builder: (context, value, __) {
-                        //       print('--value--');
-                        //       print(value);
-                        //       return ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                         ),
-                        onPressed: snapshot.connectionState == ConnectionState.done && isActiveButton ? () =>
-                        {
-                          _sendFoundedPaths()
-                          // setState(() => futureTask = _controller.start(null))
-                        } : null,
-                        // onPressed: snapshot.data?.isCalculationFinished ? () => _sendFoundedPaths() : null,
-                        // onPressed: snapshot.data!.isCalculationFinished ? null : _sendFoundedPaths(/*context*/),
-                        // onPressed: value ? _sendFoundedPaths : null,
+                        onPressed: isDone && isActiveButton ? () => _sendFoundedPaths() : null,
                         child: const Text(
                           'Send results to server',
                           style: TextStyle(color: Colors.black),
                         ),
-                        // );
-                        // }
                       )
                   ),
                 ];
-                if (snapshot.data!.percentageCalculation == 100) {
-                  // children.insert(
-                  //     0,
-                  //     const TextContainer(text: 'All calculations has finished, you can send your results to server'));
-                  // children.add(Container(
-                  //     width: double.infinity,
-                  //     padding: const EdgeInsets.all(10.0),
-                  //     child: ElevatedButton(
-                  //       // child: ValueListenableBuilder<bool>(
-                  //       //     valueListenable: snapshot.data!.isCalculationFinished,
-                  //       //     builder: (context, value, __) {
-                  //       //       print('--value--');
-                  //       //       print(value);
-                  //       //       return ElevatedButton(
-                  //       style: ElevatedButton.styleFrom(
-                  //         shape: RoundedRectangleBorder(
-                  //           borderRadius: BorderRadius.circular(10.0),
-                  //         ),
-                  //       ),
-                  //       // onPressed: snapshot.data!.isCalculationFinished ? null : _sendFoundedPaths(/*context*/),
-                  //       onPressed: snapshot.data!.isCalculationFinished ? () => _sendFoundedPaths(/*context*/) : null,
-                  //       // onPressed: value ? _sendFoundedPaths : null,
-                  //       child: const Text(
-                  //         'Send results to server',
-                  //         style: TextStyle(color: Colors.black,),
-                  //         // style: Theme.of(context).textTheme.headline6,
-                  //       ),
-                  //       // );
-                  //       // }
-                  //     )
-                  // ));
-                } else if (snapshot.data!.percentageCalculation > 100 && snapshot.connectionState == ConnectionState.done) {
-                  switchToResultPage();
-                }
               } else {
-                children = <Widget>[
-                  const Text('Empty data'),
-                ];
+                children = TextContainer.getTextErrorList(context, 'Empty data');
               }
               break;
           }
@@ -154,47 +100,17 @@ class _ProgressWidgetState extends State<ProgressWidget> {
   }
 
 
-  _sendFoundedPaths(/*BuildContext context*/) async { // ToDo move to _controller
+  void _sendFoundedPaths() async {
     setState(() => isActiveButton = false);
-    // print('processFindPath');
-    // print(processFindPath);
-    // await _controller.sendCalculatedPaths();
-    // OR
-    // List<dynamic> tasksData = await PathFinderApi().setResults(processFindPath?.prepareResultsToSending());
-    // print('tasksData');
-    // print(tasksData);
     List<PrepareResultToSending>? prepareResultsToSending = await _controller.sendCalculatedPaths();
-    // print('prepareResultsToSending');
-    // print(prepareResultsToSending);
 
     if (prepareResultsToSending != null) {
-      /*
-      Navigator.pushNamed(context, '/result_list');
-       */
-      // Navigator.pushNamed(context, '/result_list', arguments: Future.value(prepareResultsToSending));
-      // Navigator.of(context).push(
-      //     MaterialPageRoute(
-      //         builder: (context) => ResultListPage(prepareResultsToSending: Future.value(prepareResultsToSending))
-      //     )
-      // );
-      // OR
-      // _pagesState.switchPageIndex(1);
-      // MaterialPageRoute(
-      //   builder: (context) => ResultListPage(),
-      // );
-      // var globalKeys = await LocalStorage.getData(fileName: 'globalKeys');
-      // print('globalKeys b');
-      // print(globalKeys);
-      // globalKeys = globalKeys as GlobalKey;
-      // print('globalKeys a');
-      // print(globalKeys);
-      //
-      // final BottomNavigation bottomNavigation = globalKeys.currentWidget as BottomNavigation;
-      // bottomNavigation.onSelectTab(TabItem.resultList);
       switchToResultPage();
     }
+
     setState(() => isActiveButton = true);
   }
+
   void switchToResultPage() {
     final Widget? bottomNavigation = widget.globalKeyBottomNavigation.currentWidget;
 

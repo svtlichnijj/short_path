@@ -54,4 +54,8 @@ class Field {
 
     return json;
   }
+
+  int get size {
+    return rowsColumns.length * rowsColumns[0].length;
+  }
 }

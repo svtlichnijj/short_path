@@ -28,4 +28,8 @@ class Task {
   int getMinSteps() {
     return max((start.x - end.x).abs(), (start.y - end.y).abs());
   }
+
+  int getMaxSteps() {
+    return field.size;
+  }
 }

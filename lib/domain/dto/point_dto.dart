@@ -21,6 +21,17 @@ class PointDto {
     this.state = PointStates.passing,
   });
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is PointDto &&
+              runtimeType == other.runtimeType &&
+              x == other.x &&
+              y == other.y;
+
+  @override
+  int get hashCode => x.hashCode ^ y.hashCode;
+
   factory PointDto.fromJson(Map<String, dynamic> json) => _$PointDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$PointDtoToJson(this);

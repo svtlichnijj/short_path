@@ -64,7 +64,7 @@ class FieldPath {
         }
       }
     }
-    
+
     return pointColorType;
   }
 }

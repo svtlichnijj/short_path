@@ -59,7 +59,7 @@ class _PreviewResultWidgetState extends State<PreviewResultWidget> {
       int rowLength = row.length;
       double squareDimension = MediaQuery.of(context).size.width / rowLength;
 
-      for (int c = 0; c <= rowLength - 1; c++) {
+      for (int c = 0; c < rowLength; c++) {
         tableCells.add(TableCell(
             child: SizedBox.square(
               child: Container(
@@ -67,7 +67,8 @@ class _PreviewResultWidgetState extends State<PreviewResultWidget> {
                 child: Center(
                   child: Text(
                     row[c].toPath(),
-                    style: const TextStyle(backgroundColor: Colors.white, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        backgroundColor: Colors.transparent, color: Colors.deepPurple, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),

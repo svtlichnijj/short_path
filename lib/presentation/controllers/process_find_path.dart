@@ -56,29 +56,29 @@ class ProcessFindPath {
       return pathsPotential.first;
     }
 
+    List<List<int>> nextPlusCoordinates = [
+      [0, 1],
+      [1, 1],
+      [1, 0],
+      [1, -1],
+      [0, -1],
+      [-1, -1],
+      [-1, 0],
+      [-1, 1],
+    ];
     List<FieldPath> pathsValid = [];
 
-    while (pathsValid.isEmpty) {
+    int taskLeftSteps = task.getMaxSteps();
+
+    while (pathsValid.isEmpty && taskLeftSteps > 0) {
       for (int ps = 0; ps < pathsPotential.length; ps++) {
         FieldPath pathPotential = FieldPath.fromJson(pathsPotential.first.toJson());
         PointDto pathPotentialLastStep = pathPotential.points.last;
-        int plusCurrStepX = (task.end.x - pathPotentialLastStep.x).sign;
-        int plusCurrStepY = (task.end.y - pathPotentialLastStep.y).sign;
 
-        int plusBeforeYAfterX = (plusCurrStepX + plusCurrStepY).sign;
-        int plusBeforeStepX = (plusCurrStepX - plusCurrStepY).sign;
-        int plusAfterStepY = (plusCurrStepY - plusCurrStepX).sign;
-        Set<List<int>> nextCoordinates = {};
-        nextCoordinates.addAll([
-          [pathPotentialLastStep.x + plusCurrStepX, pathPotentialLastStep.y + plusCurrStepY],
-          [pathPotentialLastStep.x + plusBeforeStepX, pathPotentialLastStep.y + plusBeforeYAfterX],
-          [pathPotentialLastStep.x + plusBeforeYAfterX, pathPotentialLastStep.y + plusAfterStepY],
-        ]);
-
-        for (List<int> nextCoordinate in nextCoordinates) {
+        for (List<int> nextPlusCoordinate in nextPlusCoordinates) {
           FieldPath currentPath = FieldPath.fromJson(pathPotential.toJson());
 
-          if (currentPath.addPointByXY(nextCoordinate[0], nextCoordinate[1])) {
+          if (currentPath.addPoint(PointDto(x: pathPotentialLastStep.x + nextPlusCoordinate[0], y: pathPotentialLastStep.y + nextPlusCoordinate[1]))) {
             if (currentPath.points.last.isEqual(task.end)) {
               pathsValid.add(currentPath);
             }
@@ -89,6 +89,8 @@ class ProcessFindPath {
 
         pathsPotential.removeAt(0);
       }
+
+      --taskLeftSteps;
     }
 
     if (pathsValid.isEmpty) {

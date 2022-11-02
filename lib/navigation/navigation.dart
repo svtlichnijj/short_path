@@ -33,7 +33,7 @@ class _NavigationState extends State<Navigation> {
         final isFirstRouteInCurrentTab = !await _navigatorKeys[_currentTab]!.currentState!.maybePop();
         if (isFirstRouteInCurrentTab) {
           if (_currentTab != TabItem.main) { // if not on the 'main' tab
-            _selectTab(TabItem.main); // select 'main' tab
+            selectTab(TabItem.main); // select 'main' tab
             return false; // back button handled by app
           }
         }
@@ -48,13 +48,13 @@ class _NavigationState extends State<Navigation> {
         bottomNavigationBar: BottomNavigation(
           key: globalKeyBottomNavigation,
           currentTab: _currentTab,
-          onSelectTab: _selectTab,
+          onSelectTab: selectTab,
         ),
       ),
     );
   }
 
-  void _selectTab(TabItem tabItem) {
+  void selectTab(TabItem tabItem) {
     if (tabItem == _currentTab) {
       _navigatorKeys[tabItem]!.currentState!.popUntil((route) => route.isFirst); // pop to first route
     } else {

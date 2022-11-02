@@ -25,8 +25,8 @@ class PrepareResultToSending {
     Map<String, FieldPath>? pathsPoints;
 
     while (pathsPoints == null) {
-      pathsPoints = await LocalStorage.getPaths();
       await Future<void>.delayed(const Duration(seconds: 2));
+      pathsPoints = await LocalStorage.getPaths();
       yield prepareResultsFromPathsPoints({});
     }
 

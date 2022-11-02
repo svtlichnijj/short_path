@@ -64,8 +64,7 @@ class _MainPageState extends State<MainPage> {
                       ),
                     )
                   ],
-                ) /*;
-                        })*/
+                )
             ),
             Container(
                 width: double.infinity,
@@ -82,8 +81,7 @@ class _MainPageState extends State<MainPage> {
                         onPressed: value ? _startProcess : null,
                         child: const Text('Start'),
                       );
-                    }
-                )
+                    })
             )
           ],
         ),
@@ -97,12 +95,11 @@ class _MainPageState extends State<MainPage> {
     if (_errorText == null) {
       Navigator.of(context).push(
           MaterialPageRoute(
-              builder: (context) {
-                return ProcessPage(
-                  processUrl: _controller.urlTextEditing.text,
-                  globalKeyBottomNavigation: widget.globalKeyBottomNavigation,
-                );
-              }
+              builder: (context) =>
+                  ProcessPage(
+                      processUrl: _controller.urlTextEditing.text,
+                      globalKeyBottomNavigation: widget.globalKeyBottomNavigation
+                  )
           )
       );
     }

@@ -105,13 +105,13 @@ class _ProgressWidgetState extends State<ProgressWidget> {
     List<PrepareResultToSending>? prepareResultsToSending = await _controller.sendCalculatedPaths();
 
     if (prepareResultsToSending != null) {
-      switchToResultPage();
+      _switchToResultPage();
     }
 
     setState(() => isActiveButton = true);
   }
 
-  void switchToResultPage() {
+  void _switchToResultPage() {
     final Widget? bottomNavigation = widget.globalKeyBottomNavigation.currentWidget;
 
     if (bottomNavigation is BottomNavigation) {
